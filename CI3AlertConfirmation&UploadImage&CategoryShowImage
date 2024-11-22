@@ -1,0 +1,145 @@
+VIEW:
+ <tbody>
+                   
+                        <?php 
+                          $fileDC = ''; 
+                          $fileDF = ''; 
+
+                          foreach ($drawing as $drw): 
+                              if (strpos($drw['link_file'], 'DC') !== false) {
+                                  $fileDC = $drw['link_file']; 
+                              } elseif (strpos($drw['link_file'], 'DF') !== false) {
+                                  $fileDF = $drw['link_file']; 
+                              }
+                          endforeach; 
+                        ?>
+
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td class="text-center">Drawing Core</td>
+                            <td class="text-center">
+                                <?php if (empty($fileDC)): ?>
+                                    <form id="form_dc" method="post" action="<?=base_url('common/commonmaintenanceserviceicon/uploaddrawing?user_token=').$this->session->userdata('user_token')?>" enctype="multipart/form-data">
+                                        <input type="hidden" name="id_ticket" class="form-control form-control-sm" readonly value="<?=$ticket['recid']?>">
+                                        <input type="hidden" name="kategori_upload" class="form-control form-control-sm" readonly value="Drawing">
+                                        <input type="hidden" name="tipe_drawing" class="form-control form-control-sm" readonly value="DC">
+                                        <input type="hidden" name="no_ticket" class="form-control form-control-sm" readonly value="<?=$ticket['no_ticket_msa']?>">
+                                        <div class="d-flex">
+                                            <input required accept="image/png, image/jpeg, image/jpg, image/heic" type="file" name="link_file" class="form-control form-control-sm" id="file_dc">
+                                            <button class="btn btn-sm btn-birumsa" type="submit" id="submit_dc" data-toggle="tooltip" title="Submit Drawing Core"><i class="fa fa-upload"></i></button>
+                                        </div>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="<?=base_url('common/commonfileaction/view?f=sharedfolder/lampiran/Maintenance_Service/'.$ticket['no_ticket_msa'].'/Drawing/'.urlencode($fileDC))?>" target="_viewfile" class="btn btn-sm btn-birumsa"><i class="fa fa-eye"></i></a>
+                                    <a href="<?=base_url('common/commonfileaction/download?f=sharedfolder/lampiran/Maintenance_Service/'.$ticket['no_ticket_msa'].'/Drawing/'.urlencode($fileDC))?>" target="_downloadfile" class="btn btn-sm btn-birumsa"><i class="fa fa-download"></i></a>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td class="text-center">Drawing Flow</td>
+                            <td class="text-center">
+                                <?php if (empty($fileDF)): ?>
+                                    <form id="form_df" method="post" action="<?=base_url('common/commonmaintenanceserviceicon/uploaddrawing?user_token=').$this->session->userdata('user_token')?>" enctype="multipart/form-data">
+                                        <input type="hidden" name="id_ticket" class="form-control form-control-sm" readonly value="<?=$ticket['recid']?>">
+                                        <input type="hidden" name="kategori_upload" class="form-control form-control-sm" readonly value="Drawing">
+                                        <input type="hidden" name="tipe_drawing" class="form-control form-control-sm" readonly value="DF">
+                                        <input type="hidden" name="no_ticket" class="form-control form-control-sm" readonly value="<?=$ticket['no_ticket_msa']?>">
+                                        <div class="d-flex">
+                                            <input required accept="image/png, image/jpeg, image/jpg, image/heic" type="file" name="link_file" class="form-control form-control-sm" id="file_df">
+                                            <button class="btn btn-sm btn-birumsa" type="submit" id="submit_df" data-toggle="tooltip" title="Submit Drawing Flow"><i class="fa fa-upload"></i></button>
+                                        </div>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="<?=base_url('common/commonfileaction/view?f=sharedfolder/lampiran/Maintenance_Service/'.$ticket['no_ticket_msa'].'/Drawing/'.urlencode($fileDF))?>" target="_viewfile" class="btn btn-sm btn-birumsa"><i class="fa fa-eye"></i></a>
+                                    <a href="<?=base_url('common/commonfileaction/download?f=sharedfolder/lampiran/Maintenance_Service/'.$ticket['no_ticket_msa'].'/Drawing/'.urlencode($fileDF))?>" target="_downloadfile" class="btn btn-sm btn-birumsa"><i class="fa fa-download"></i></a>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
+                                    <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+JS:
+document.getElementById('submit_dc').addEventListener('click', function(event) {
+  event.preventDefault(); 
+  var confirmSubmit = confirm("Apakah Anda yakin hendak mengupload Drawing Core ini?");
+  if (confirmSubmit) {
+      document.getElementById('form_dc').submit();
+  }
+});
+
+document.getElementById('submit_df').addEventListener('click', function(event) {
+  event.preventDefault(); 
+  var confirmSubmit = confirm("Apakah Anda yakin hendak mengupload Drawing Flow ini?");
+  if (confirmSubmit) {
+      document.getElementById('form_df').submit();
+  }
+});
+
+CONTROLLER:
+ public function uploaddrawing(){
+    if ($this->input->method() === 'post') {
+        $id_ticket = $this->input->post('id_ticket');
+        $kategori_upload = $this->input->post('kategori_upload');
+        $tipe_drawing = $this->input->post('tipe_drawing');
+        $no_ticket_msa = $this->input->post('no_ticket');
+        $file = $_FILES['link_file'];
+
+        if ($file && $file['error'] == 0) {
+            $file_ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+
+            $allowed_extensions = ['jpg', 'png', 'jpeg', 'heic'];
+            if (!in_array($file_ext, $allowed_extensions)) {
+                echo "<script>alert('Format file tidak diperbolehkan!, bolehnya cuma jpg, png, jpeg, dan heic!');</script>";
+                echo "<script>window.location.href = '" . site_url('project/projectmaintenanceserviceicon/view?user_token=' . $this->session->userdata('user_token') . '&id=' . $id_ticket) . "';</script>";
+                return; 
+            }
+
+
+            $filename = date('YmdHis') . '_' . $tipe_drawing . '_' . $no_ticket_msa . '.' . $file_ext;
+
+            $upload_dir = SHAREDFOLDER . 'lampiran/Maintenance_Service/' . $no_ticket_msa . '/Drawing/';
+            if (!file_exists($upload_dir)) {
+                mkdir($upload_dir, 0777, true);  
+            }
+
+            $file_path = $upload_dir . $filename;
+            if (move_uploaded_file($file['tmp_name'], $file_path)) {
+                $data = [
+                    'id_ticket' => $id_ticket,
+                    'tanggal_upload' => date('Y-m-d H:i'),
+                    'lampiran' => '#file:///\\\\192.168.1.100\\lampiran\\Maintenance_Service\\' . $no_ticket_msa . '\\Drawing#',
+                    'link_file' => $filename,
+                    'kategori_upload' => 'Drawing',
+                ];
+
+                $this->project->insertDrawingDocumentation($data);
+
+                redirect('project/projectmaintenanceserviceicon/view?user_token='.$this->session->userdata('user_token').'&id='.$id_ticket.''); 
+            } else {
+                echo 'Gagal Upload Drawing.';
+            }
+        } else {
+            echo 'File upload error: ' . $file['error'];
+        }
+    }
+  }
+
+MODEL:
+ public function insertDrawingDocumentation($data) {
+      $DB2=$this->load->database('old_db',TRUE);
+      $DB2->insert('eng_maintenance_documentation', $data);
+    }
